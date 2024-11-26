@@ -1,0 +1,25 @@
+import os
+from pdf2docx import Converter
+
+def convert_pdf_to_word(pdf_path, docx_path):
+    # Funzione per convertire un file PDF in DOCX
+    cv = Converter(pdf_path)
+    cv.convert(docx_path, start=0, end=None)
+    cv.close()
+    print(f"Convertito: {pdf_path} -> {docx_path}")
+
+def convert_all_pdfs_in_folder(folder_path):
+    # Scorre la cartella e converte tutti i file PDF
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.pdf'):
+            pdf_file = os.path.join(folder_path, filename)
+            docx_file = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.docx")
+            convert_pdf_to_word(pdf_file, docx_file)
+
+def main():
+    folder_path = input("Inserisci il percorso della cartella contenente i PDF: ")
+    convert_all_pdfs_in_folder(folder_path)
+    print("Conversione completata!")
+
+if __name__ == "__main__":
+    main()
