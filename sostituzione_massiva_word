@@ -1,0 +1,37 @@
+import os
+from docx import Document
+
+def replace_word_in_docx(file_path, old_word, new_word):
+    doc = Document(file_path)
+    count = 0  # Variabile per contare le sostituzioni
+
+    # Sostituisce nelle frasi del documento
+    for paragraph in doc.paragraphs:
+        if old_word in paragraph.text:
+            count += paragraph.text.count(old_word)
+            paragraph.text = paragraph.text.replace(old_word, new_word)
+
+    # Sostituisce nelle celle delle tabelle, se presenti
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                if old_word in cell.text:
+                    count += cell.text.count(old_word)
+                    cell.text = cell.text.replace(old_word, new_word)
+
+    doc.save(file_path)
+    return count  # Restituisce il numero di sostituzioni effettuate
+
+def replace_word_in_all_docs(folder_path, old_word, new_word):
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".docx"):
+            file_path = os.path.join(folder_path, filename)
+            num_replacements = replace_word_in_docx(file_path, old_word, new_word)
+            print(f"Sostituito '{old_word}' con '{new_word}' in {filename}. Sostituzioni effettuate: {num_replacements}")
+
+# Richiedi input all'utente
+folder_path = input("Inserisci il percorso della cartella: ")
+old_word = input("Inserisci la parola da sostituire: ")
+new_word = input("Inserisci la nuova parola: ")
+
+replace_word_in_all_docs(folder_path, old_word, new_word)
