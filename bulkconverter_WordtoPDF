@@ -1,0 +1,45 @@
+import os
+import win32com.client
+
+def convert_word_to_pdf(docx_path, pdf_path):
+    # Inizializza l'applicazione Word
+    word = win32com.client.Dispatch('Word.Application')
+    word.Visible = False
+    
+    # Apri il documento Word
+    doc = word.Documents.Open(docx_path)
+    
+    # Disattiva la visualizzazione delle revisioni
+    doc.TrackRevisions = False
+    word.ActiveWindow.View.RevisionsFilter.Markup = 0  # Nasconde tutte le revisioni
+    
+    # Rimuovi i commenti
+    while doc.Comments.Count > 0:
+        doc.Comments[0].Delete()
+    
+    # Accetta tutte le revisioni
+    doc.AcceptAllRevisions()
+    
+    # Aggiorna i campi (compreso l'indice)
+    doc.Fields.Update()
+    
+    # Salva come PDF
+    doc.SaveAs(pdf_path, FileFormat=17)  # 17 corrisponde al formato PDF
+    doc.Close()
+    print(f"Convertito: {docx_path} -> {pdf_path}")
+
+def convert_all_words_in_folder(folder_path):
+    # Scorre la cartella e converte tutti i file Word
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.docx'):
+            docx_file = os.path.join(folder_path, filename)
+            pdf_file = os.path.join(folder_path, f"{os.path.splitext(filename)[0]}.pdf")
+            convert_word_to_pdf(docx_file, pdf_file)
+
+def main():
+    folder_path = input("Inserisci il percorso della cartella contenente i file Word: ")
+    convert_all_words_in_folder(folder_path)
+    print("Conversione completata!")
+
+if __name__ == "__main__":
+    main()
